@@ -1,7 +1,7 @@
 # Nginx 筆記
 
 **[index](#index)**
-* [install module]](#install module)
+* [install module]](#install-module)
 * [$document_root](#$document_root)
 * [$uri](#$uri)
 * [$args](#$args)
