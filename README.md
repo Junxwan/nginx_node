@@ -5,11 +5,10 @@
     - [$uri](#uri)
     - [$args](#args)
     - [try_files](#tryfiles)
+    - [基本範例](#%E5%9F%BA%E6%9C%AC%E7%AF%84%E4%BE%8B)
 
 ## install module
-假設想要安裝nginx第三方模組則需要重新編譯nginx執行檔，本篇設定mac電腦上已有安裝nginx且是透過brew install nginx安裝
-
-以nginx echo-nginx-module為例子
+假設想要安裝nginx第三方模組則需要重新編譯nginx執行檔，本篇設定mac電腦上已有安裝nginx且是透過brew install nginx安裝，以nginx echo-nginx-module為例子
 
 首先看看本地的nginx版本
 
@@ -36,11 +35,11 @@
     TLS SNI support enabled
     configure arguments: --prefix=/usr/local/Cellar/nginx/1.15.3 --sbin-path=/usr/local/Cellar/nginx/1.15.3/bin/nginx --with-cc-opt='-I/usr/local/opt/pcre/include -I/usr/local/opt/openssl/include' --with-ld-opt='-L/usr/local/opt/pcre/lib -L/usr/local/opt/openssl/lib' --conf-path=/usr/local/etc/nginx/nginx.conf --pid-path=/usr/local/var/run/nginx.pid --lock-path=/usr/local/var/run/nginx.lock --http-client-body-temp-path=/usr/local/var/run/nginx/client_body_temp --http-proxy-temp-path=/usr/local/var/run/nginx/proxy_temp --http-fastcgi-temp-path=/usr/local/var/run/nginx/fastcgi_temp --http-uwsgi-temp-path=/usr/local/var/run/nginx/uwsgi_temp --http-scgi-temp-path=/usr/local/var/run/nginx/scgi_temp --http-log-path=/usr/local/var/log/nginx/access.log --error-log-path=/usr/local/var/log/nginx/error.log --with-debug --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_degradation_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-ipv6 --with-mail --with-mail_ssl_module --with-pcre --with-pcre-jit --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/Users/ne0002/Downloads/echo-nginx-module-0.61
 
-從--prefix到最後就是編譯本地nginx的資訊，在最後面加上--add-module=/path/to/echo-nginx-module，要安裝的module
+從`--prefix`到最後就是編譯本地nginx的資訊，在最後面加上`--add-module=/path/to/echo-nginx-module`，要安裝的module
 
     $ ./configure --prefix=/usr/local/Cellar/nginx/1.15.3 --sbin-path=/usr/local/Cellar/nginx/1.15.3/bin/nginx --with-cc-opt='-I/usr/local/opt/pcre/include -I/usr/local/opt/openssl/include' --with-ld-opt='-L/usr/local/opt/pcre/lib -L/usr/local/opt/openssl/lib' --conf-path=/usr/local/etc/nginx/nginx.conf --pid-path=/usr/local/var/run/nginx.pid --lock-path=/usr/local/var/run/nginx.lock --http-client-body-temp-path=/usr/local/var/run/nginx/client_body_temp --http-proxy-temp-path=/usr/local/var/run/nginx/proxy_temp --http-fastcgi-temp-path=/usr/local/var/run/nginx/fastcgi_temp --http-uwsgi-temp-path=/usr/local/var/run/nginx/uwsgi_temp --http-scgi-temp-path=/usr/local/var/run/nginx/scgi_temp --http-log-path=/usr/local/var/log/nginx/access.log --error-log-path=/usr/local/var/log/nginx/error.log --with-debug --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_degradation_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-ipv6 --with-mail --with-mail_ssl_module --with-pcre --with-pcre-jit --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/Users/ne0002/Downloads/echo-nginx-module-0.61 --add-module=/path/to/echo-nginx-module
 
-    $make
+    $ make
 
 然後在將編譯完成的nginx覆蓋到本地的nginx，重啟nginx就完成
 
@@ -70,9 +69,36 @@
 
 ## $uri
 
-假設請求為http://www.api.test/nginx/index.php，$uri就是/nginx/index.php
+假設請求為`http://www.api.test/nginx/index.php`，$uri就是`/nginx/index.php`
 
 ## $args
-假設請求為http://www.api.test/nginx?q=1，$args就是q=1
+假設請求為`http://www.api.test/nginx?q=1`，$args就是`q=1`
 
 ## try_files 
+
+## 基本範例
+
+    server {
+        listen       80;                    # 監聽80 prot                                            
+        
+        server_name  web.fontend.test;      # host
+        
+        root    /var/www/web/public;        # 專案根目錄
+
+        index  index.php;                   # 預設執行檔案
+
+        location / {                        # 當url匹配到/
+            try_files $uri $uri/ /index.php$is_args$args;   # 嘗試找這些檔案
+        }
+
+        location ~ \.php$ {                                 # url檔案為.php就利用fastcgi機制送到php-fpm解析php檔
+            root           /var/www/web/public;;            
+            fastcgi_pass   127.0.0.1:9000;                  # php-fpm默認執行在9000 prot，將php送到此prot做解析 
+            fastcgi_index  index.php;                   
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name; # 要解析的php檔案與url path info
+            include        fastcgi_params;                                      # 載入nginx/fastcgi_params做一些設定環境變數                       
+        }
+
+        error_log /www/log/nginx/web_fontend_error.log;
+        access_log /www/log/nginx/web_fontend_access.log;
+    }
