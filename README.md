@@ -1,11 +1,10 @@
 # Nginx 筆記
-
-**[index](#index)**
-* [install module]](#install-module)
-* [$document_root](#$document_root)
-* [$uri](#$uri)
-* [$args](#$args)
-* [try_files](#try_files)
+- [Nginx 筆記](#nginx-%E7%AD%86%E8%A8%98)
+    - [install module](#install-module)
+    - [$document_root](#documentroot)
+    - [$uri](#uri)
+    - [$args](#args)
+    - [try_files](#tryfiles)
 
 ## install module
 假設想要安裝nginx第三方模組則需要重新編譯nginx執行檔，本篇設定mac電腦上已有安裝nginx且是透過brew install nginx安裝
@@ -29,6 +28,7 @@
     $ tar -xzvf echo-nginx-module-0.61.tar.gz
 
 要重新編譯nginx並替換掉本地的nginx需要先知道目前nginx install的編譯資訊
+
     $ nginx -V
     nginx version: nginx/1.15.2
     built by clang 9.1.0 (clang-902.0.39.2)
