@@ -67,7 +67,7 @@
 
 ## $document_root
 
-由root配置，當root是`/var/www`，同理$document_root就是`/var/www`
+由root配置，當root是`/var/www`，同理$document_root就是`/var/www`
 
 ## $uri
 
@@ -82,7 +82,7 @@
 
 > 如同PHP $_SERVER['REQUEST_URI']
 
-## set 
+## set
 
 設定變數如下將`$document_root`設定為`/var/www/public`
 
