@@ -4,6 +4,8 @@
     - [$document_root](#documentroot)
     - [$uri](#uri)
     - [$args](#args)
+    - [$request_uri](#requesturi)
+    - [set](#set)
     - [try_files](#tryfiles)
     - [基本範例](#%E5%9F%BA%E6%9C%AC%E7%AF%84%E4%BE%8B)
 
@@ -74,7 +76,67 @@
 ## $args
 假設請求為`http://www.api.test/nginx?q=1`，$args就是`q=1`
 
-## try_files 
+## $request_uri
+
+假設請求為`http://www.api.test/nginx`，$request_uri為`/nginx`
+
+> 如同PHP $_SERVER['REQUEST_URI']
+
+## set 
+
+設定變數如下將`$document_root`設定為`/var/www/public`
+
+    server {
+        listen       80;
+        
+        server_name  nginx.web.test;
+
+        root    /var/www;
+
+        set $document_root /var/www/public;
+
+        index  index.php;
+
+        location / {
+            echo $document_root; # 利用echo輸出$document_root做測試
+        }
+    }
+
+設定一個變數
+
+## try_files
+
+假設發送一個請求為`http://web.api.test`，符合`location /`而`try_files $uri $uri/ /index.php`，代表著嘗試存取該規則檔案或是目錄
+    
+    server {    
+        listen       80;
+
+        server_name  web.api.test;
+
+        root    /var/www/web/public
+
+        index  index.php;
+
+        location / {
+            try_files $uri $uri/ /index.php;
+        }
+
+        location ~ \.php$ {
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+    }
+
+1. `$uri`為` `會嘗試讀取/var/www/web/public檔案
+
+2. `$uri/`為`/`會嘗試讀取/var/www/web/public/目錄
+
+3. 當前面嘗試存取的檔案都不存在時，最後一個規則一定要能存取成功
+`/index.php`代表讀取/var/www/web/public/index.php
+
+4. 由於是`.php`檔案所以會藉由fastcgi將index.php傳送至php-fpm做解析
 
 ## 基本範例
 
