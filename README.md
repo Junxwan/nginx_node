@@ -2,6 +2,7 @@
 - [Nginx 筆記](#nginx-%E7%AD%86%E8%A8%98)
     - [install module](#install-module)
     - [$document_root](#documentroot)
+    - [$fastcgi_script_name](#fastcgiscriptname)
     - [$uri](#uri)
     - [$args](#args)
     - [$request_uri](#requesturi)
@@ -69,6 +70,12 @@
 
 由root配置，當root是`/var/www`，同理$document_root就是`/var/www`
 
+## $fastcgi_script_name
+
+假設請求為`http://www.api.test/nginx`，$fastcgi_script_name為`/nginx`
+
+> 此值會傳到PHP $_SERVER['SCRIPT_NAME']
+
 ## $uri
 
 假設請求為`http://www.api.test/nginx/index.php`，$uri就是`/nginx/index.php`
@@ -80,7 +87,7 @@
 
 假設請求為`http://www.api.test/nginx`，$request_uri為`/nginx`
 
-> 如同PHP $_SERVER['REQUEST_URI']
+> 此值會傳到PHP $_SERVER['REQUEST_URI']
 
 ## set
 
@@ -88,7 +95,7 @@
 
     server {
         listen       80;
-        
+
         server_name  nginx.web.test;
 
         root    /var/www;
@@ -107,8 +114,8 @@
 ## try_files
 
 假設發送一個請求為`http://web.api.test`，符合`location /`而`try_files $uri $uri/ /index.php`，代表著嘗試存取該規則檔案或是目錄
-    
-    server {    
+
+    server {
         listen       80;
 
         server_name  web.api.test;
