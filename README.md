@@ -7,7 +7,9 @@
     - [$args](#args)
     - [$request_uri](#requesturi)
     - [set](#set)
-    - [try_files](#tryfiles)
+    - [try_files](#try_files)
+    - [rewrite](#rewrite)
+        - [配對到某的path之後全改寫](#配對到某的path之後全改寫)
     - [基本範例](#%E5%9F%BA%E6%9C%AC%E7%AF%84%E4%BE%8B)
 
 ## install module
@@ -68,11 +70,11 @@
 
 ## $document_root
 
-由root配置，當root是`/var/www`，同理$document_root就是`/var/www`
+由root配置，當root是`/var/www`，同理$document_root就是`/var/www`
 
 ## $fastcgi_script_name
 
-假設請求為`http://www.api.test/nginx`，$fastcgi_script_name為`/nginx`
+假設請求為`http://www.api.test/nginx`，$fastcgi_script_name為`/nginx`
 
 > 此值會傳到PHP $_SERVER['SCRIPT_NAME']
 
@@ -85,9 +87,9 @@
 
 ## $request_uri
 
-假設請求為`http://www.api.test/nginx`，$request_uri為`/nginx`
+假設請求為`http://www.api.test/nginx`，$request_uri為`/nginx`
 
-> 此值會傳到PHP $_SERVER['REQUEST_URI']
+> 此值會傳到PHP $_SERVER['REQUEST_URI']
 
 ## set
 
@@ -136,14 +138,22 @@
         }
     }
 
-1. `$uri`為` `會嘗試讀取/var/www/web/public檔案
+1. `$uri`為` `會嘗試讀取/var/www/web/public檔案
 
-2. `$uri/`為`/`會嘗試讀取/var/www/web/public/目錄
+2. `$uri/`為`/`會嘗試讀取/var/www/web/public/目錄
 
-3. 當前面嘗試存取的檔案都不存在時，最後一個規則一定要能存取成功
+3. 當前面嘗試存取的檔案都不存在時，最後一個規則一定要能存取成功
 `/index.php`代表讀取/var/www/web/public/index.php
 
 4. 由於是`.php`檔案所以會藉由fastcgi將index.php傳送至php-fpm做解析
+
+# rewrite 
+
+改寫url
+
+## 配對到某的path之後全改寫
+
+    rewrite ^(/dashbord)/(.*)$ /login/ last;
 
 ## 基本範例
 
